@@ -51,7 +51,9 @@ app.use(apiKeyMiddleware);
 // Route to handle the incoming data
 app.post('/data', async (req, res) => {
   const data = req.body;
+  console.log("Request Objet :",req);
   console.log('Received data:', data);
+ 
 
   try {
     // Save the data to MongoDB using the Mongoose model
