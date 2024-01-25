@@ -3,14 +3,14 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const app = express();
+
 const port = 3000;
 
 // Middleware to parse JSON requests
-app.use(bodyParser.json());
+app.use(express.json());
 
 // MongoDB Atlas connection
 const uri = "mongodb+srv://abdullahkiet89:abdullahkiet89@data.kvgwgri.mongodb.net/UWB?retryWrites=true&w=majority";
-// const uri = "mongodb+srv://hadiyaebrahim:Hello123@cluster0.cojugwv.mongodb.net/your_database_name?retryWrites=true&w=majority";
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
