@@ -36,7 +36,21 @@ async function connectToMongoDB() {
 
     // Route to handle the incoming data
     app.post('/data', async (req, res) => {
-      const data = req.body;
+      const requestData = req.body;
+
+      // Modify the data structure based on your actual data
+      const data = {
+        transmitterSerialNumber: requestData.transmitterSerialNumber,
+        nodeType: requestData.nodeType,
+        reads: requestData.reads.map(read => ({
+          timeStampUTC: read.timeStampUTC,
+          deviceUID: read.deviceUID,
+          manufacturerName: read.manufacturerName,
+          distance: read.distance,
+          count: read.count,
+        })),
+        allCount: requestData.allCount,
+      };
 
       try {
         if (!isConnected) {
