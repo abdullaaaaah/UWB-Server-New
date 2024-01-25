@@ -45,8 +45,14 @@ async function connectToMongoDB() {
 
         // Save the data to MongoDB using the MongoClient
         const result = await collection.insertOne(data);
-        console.log('Data saved to MongoDB Atlas:', result.ops[0]);
-        res.json({ success: true });
+
+        if (result.result.ok === 1 && result.insertedCount === 1) {
+          console.log('Data saved to MongoDB Atlas:', result.ops[0]);
+          res.json({ success: true });
+        } else {
+          console.error('Error saving data to MongoDB Atlas:', result);
+          res.status(500).json({ error: 'Internal Server Error' });
+        }
       } catch (error) {
         console.error('Error saving data to MongoDB Atlas:', error);
         res.status(500).json({ error: 'Internal Server Error' });
