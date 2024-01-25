@@ -51,12 +51,22 @@ app.use(apiKeyMiddleware);
 
 // Route to handle the incoming data
 app.post('/data', async (req, res) => {
-  const data = req.body;
-  console.log("Request Objet :",req);
-  console.log('Received data:', data);
- 
+  const requestData = req.body;
 
   try {
+    const data = {
+      transmitterSerialNumber: requestData.transmitterSerialNumber,
+      nodeType: requestData.nodeType,
+      reads: [{
+        timeStampUTC: requestData.reads[0].timeStampUTC,
+        deviceUID: requestData.reads[0].deviceUID,
+        manufacturerName: requestData.reads[0].manufacturerName,
+        distance: requestData.reads[0].distance,
+        count: requestData.reads[0].count,
+      }],
+      allCount: requestData.allCount,
+    };
+
     // Save the data to MongoDB using the Mongoose model
     const savedData = await DataModel.create(data);
     console.log('Data saved to MongoDB Atlas:', savedData);
