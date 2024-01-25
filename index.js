@@ -1,83 +1,66 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-
 const app = express();
-const port = 3000;
+const bodyParser = require('body-parser');
+const { MongoClient } = require('mongodb');
 
-// Middleware to parse JSON requests
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB Atlas connection
 const uri = "mongodb+srv://abdullahkiet89:abdullahkiet89@data.kvgwgri.mongodb.net/UWB?retryWrites=true&w=majority";
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
 
-// Define a Mongoose schema for your data
-const dataSchema = new mongoose.Schema({
-  transmitterSerialNumber: String,
-  nodeType: String,
-  reads: [{
-    timeStampUTC: String,
-    deviceUID: String,
-    manufacturerName: String,
-    distance: Number,
-    count: Number,
-  }],
-  allCount: Number,
-});
-
-// Create a Mongoose model based on the schema
-const DataModel = mongoose.model('Data', dataSchema);
-
-// Middleware to check API key
-const apiKeyMiddleware = (req, res, next) => {
-  const apiKey = req.query.apiKey;
-
-  // Check if apiKey is present and has the expected value
-  if (!apiKey || apiKey !== 'default-api-key') {
-    return res.status(401).json({ error: 'Invalid API key' });
-  }
-
-  // Continue to the next middleware or route handler
-  next();
-};
-
-// Apply API key middleware to all routes
-app.use(apiKeyMiddleware);
-
-// Route to handle the incoming data
-app.post('/data', async (req, res) => {
-  const requestData = req.body;
-
+async function connectToMongoDB() {
   try {
-    const data = {
-      transmitterSerialNumber: requestData.transmitterSerialNumber,
-      nodeType: requestData.nodeType,
-      reads: [{
-        timeStampUTC: requestData.reads[0].timeStampUTC,
-        deviceUID: requestData.reads[0].deviceUID,
-        manufacturerName: requestData.reads[0].manufacturerName,
-        distance: requestData.reads[0].distance,
-        count: requestData.reads[0].count,
-      }],
-      allCount: requestData.allCount,
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    let isConnected = false;
+
+    await client.connect();
+    isConnected = true;
+
+    const collection = client.db("UWB").collection("data");
+
+    // Middleware to check API key
+    const apiKeyMiddleware = (req, res, next) => {
+      const apiKey = req.query.apiKey;
+
+      // Check if apiKey is present and has the expected value
+      if (!apiKey || apiKey !== 'default-api-key') {
+        return res.status(401).json({ error: 'Invalid API key' });
+      }
+
+      // Continue to the next middleware or route handler
+      next();
     };
 
-    // Save the data to MongoDB using the Mongoose model
-    const savedData = await DataModel.create(data);
-    console.log('Data saved to MongoDB Atlas:', savedData);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error saving data to MongoDB Atlas:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+    // Apply API key middleware to all routes
+    app.use(apiKeyMiddleware);
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+    // Route to handle the incoming data
+    app.post('/data', async (req, res) => {
+      const data = req.body;
+
+      try {
+        if (!isConnected) {
+          throw new Error("MongoDB client is not connected");
+        }
+
+        // Save the data to MongoDB using the MongoClient
+        const result = await collection.insertOne(data);
+        console.log('Data saved to MongoDB Atlas:', result.ops[0]);
+        res.json({ success: true });
+      } catch (error) {
+        console.error('Error saving data to MongoDB Atlas:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
+    // Start the server
+    const port = 3000;
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (err) {
+    console.error('Failed to initialize MongoDB connection:', err);
+  }
+}
+
+connectToMongoDB();
