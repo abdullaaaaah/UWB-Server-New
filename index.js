@@ -37,7 +37,7 @@ async function connectToMongoDB() {
     // Route to handle the incoming data
     app.post('/data', async (req, res) => {
       const requestData = req.body;
-      console.log("Data: " , requestData);
+      console.log("Data: ", requestData);
 
       // Modify the data structure based on your actual data
       const data = {
@@ -61,7 +61,7 @@ async function connectToMongoDB() {
         // Save the data to MongoDB using the MongoClient
         const result = await collection.insertOne(data);
 
-        if (result.result.ok === 1 && result.insertedCount === 1) {
+        if (result && result.result && result.result.ok === 1 && result.insertedCount === 1) {
           console.log('Data saved to MongoDB Atlas:', result.ops[0]);
           res.json({ success: true });
         } else {
