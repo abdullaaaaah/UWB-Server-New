@@ -37,7 +37,7 @@ async function connectToMongoDB() {
     // Route to handle the incoming data
     app.post('/data', async (req, res) => {
       const requestData = req.body;
-      print("Data: " , requestData);
+      console.log("Data: " , requestData);
 
       // Modify the data structure based on your actual data
       const data = {
