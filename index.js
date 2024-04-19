@@ -5,7 +5,7 @@ const app = express();
 const port = 3000;
 
 // Middleware to parse JSON requests
-app.use(express.json());
+app.use(bodyParser.json());
 
 // Route to handle the incoming data
 app.post('/data', (req, res) => {
@@ -18,6 +18,7 @@ app.post('/data', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 
 
 // const express = require('express');
