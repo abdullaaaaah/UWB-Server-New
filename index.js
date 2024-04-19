@@ -11,7 +11,7 @@ console.log(bodyParser.json());
   console.log('Body Parser Pass');
 // Route to handle the incoming data
 app.post('/data', (req, res) => {
-
+debbugger;
   const data = req.body;
   console.log('Received data:'+ res);
   res.json({ success: true });
