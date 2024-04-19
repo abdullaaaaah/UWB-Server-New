@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.post('/data', (req, res) => {
 
   const data = req.body;
-  console.log('Received data:'+ data);
+  console.log('Received data:'+ res+req);
   res.json({ success: true });
 });
 
