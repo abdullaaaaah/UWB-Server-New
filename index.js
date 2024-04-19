@@ -7,10 +7,12 @@ const port = 3000;
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
+  console.log('Body Parser Pass');
 // Route to handle the incoming data
 app.post('/data', (req, res) => {
+
   const data = req.body;
-  console.log('Received data:', data);
+  console.log('Received data:'+ data);
   res.json({ success: true });
 });
 
