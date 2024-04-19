@@ -6,6 +6,7 @@ const port = 3000;
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
+console.log('Going To Print Logs');
 console.log(bodyParser.json());
   console.log('Body Parser Pass');
 // Route to handle the incoming data
